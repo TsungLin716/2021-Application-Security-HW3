@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pyseedjob
+spec:
+  template:
+    spec:
+      containers:
+        - name: python-seedjobcontainer
+          image: dbseed:latest
+          imagePullPolicy: Never
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: securing-secrets
+                  key: MYSQL_ROOT_PASSWORD
+
+            - name: MYSQL_HOST
+              value: mysql-service
+
+          command: ["python3", "/scripts/load_data.py"]
+      restartPolicy: Never
+  backoffLimit: 4
+

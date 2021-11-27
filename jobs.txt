@@ -1,0 +1,22 @@
+﻿———— Migration ————
+
+First thing first,    I created a job yaml file for migration, we should migrate the whole program so I configure the image of our assignment and insert the command “Python3 manage.py migrate” inside the yaml file:
+
+After that, I used the configuration inside the django deployment yaml file and apply it to my kubernetes cluster.
+
+
+However, I get an error indicate that there is a table already exist. By what professor mentioned in slack, I should delete the old migration, so I looked at the setup.sql to check how the table is created, I noticed that I should not include this file when running the docker image, or otherwise the table will still be existed. Therefore, I comment the line which is “COPY ./setup.sql …..” , delete and rebuild the docker image. Next, I reapply the migration job and it works.
+
+
+————Seeding————
+
+In this part, I used the seeding job which created by professor in the class, I modified the python file to put a new snippet which we can create new data in the product.csv and insert them into the database. 
+
+After I built the image and applied the job, it showed an error which indicating that the table is not exist. I thought for a while and figured out that maybe I should not have commented that setup.sql line in db/Dockerfile, I take off the comment and look closely to the code, I found out that there are two lines sitting at the bottom which is loading data into the table, the rest of the code are actually for setting up the tables. That two lines of code are the bad seeding job which stated in the homework instruction, I exec into the db container shell and do some testing, I found out that these two lines might be the problem for existing table issue when migrating, I commented these two lines and migrate again. 
+
+Now, the table exists but there are a few bugs in my code due to my wrong insertion of datatype in the csv file, I correct them, then delete and rebuild the docker image. 
+
+Finally, after applied the seed job.yaml, It shows that the job is working and I exec in the database container to see if the new data is successfully inserted, it is~! All good!
+
+
+

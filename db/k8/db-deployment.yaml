@@ -31,6 +31,8 @@ spec:
                 secretKeyRef:
                   name: securing-secrets
                   key: SECRET_KEY
+            - name: MYSQL_ROOT_HOST
+              value: '%'
 
           ports:
             - containerPort: 3306
