@@ -1,0 +1,13 @@
+﻿In this part, I first took a look at views.py to see what sensitive data was being monitored. At the top of the code, the snippet where monitoring is commented with “Prometheus stuff” so I start digging from there. 
+
+
+Next, I followed the instruction, I removed them and kept browsing the code to see where the data is being monitored, I found them inside each corresponding function when render the html file, I deleted them all and rebuild the docker image and look at the metric page to check if they are all wiped out.
+
+And then, I start to look at what we should do at Part3.2 where we should use a prometheus counter to return a 404 message. Now I get it, with the prometheus, we might expose our data if we monitor them, so we should do the monitoring on the reasonable component so that we won’t expose anything due to the fact that people can just access the metric page and get what is inside our program. 
+
+
+From now on, I set up a counter, name it as “database_error_return_404” and pass it into a graph value so that we can pass it to prometheus, I looked at the code and insert the counter wherever we return the HttpResponse with 404 error. I am not sure if it’s all correct so far.
+
+Next, I followed the instruction in part3.3 to see what I should do to add Prometheus service inside our Kubernetes cluster, I took a look at helm and found their document on Github, I followed the instruction and installed the helm chart “stable” at first. However, it turns out that this chart is deprecated and there is nothing in it. I took a look at their README file and saw that they just make this chart archived since last year. How unfortunate…, it was frustrating until I found a document which shows that we should install the chart “community”, I followed the instruction and I succeed. I tried “kubectl get pod” to see if all the prometheus container are set up correctly, they are all in running state so its all fine.
+
+Finally, I followed the instruction to make the configuration, inside the yaml file I added proxy-service:8080 under the target so that we can connect it with our Giftcardsite, then I deploy the server and gateway by the command “kubectl port-forward deployment/<service> <port>”. I go to the localhost:9090 which is the prometheus server and look at the graph, there is a counter which we just passed it to prometheus and I clicked it, the 404 error from database popped up as the result of query. All good~!
